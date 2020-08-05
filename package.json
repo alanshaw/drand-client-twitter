@@ -1,5 +1,5 @@
 {
-  "name": "drand-client-twitter",
+  "name": "@alanshaw/drand-client-twitter",
   "version": "0.0.0",
   "description": "A client for the drand twitter relay",
   "main": "client.js",
@@ -10,6 +10,10 @@
   "author": "Alan Shaw",
   "license": "MIT",
   "dependencies": {
+    "drand-client": "^0.2.0"
+  },
+  "devDependencies": {
+    "abort-controller": "^3.0.0",
     "node-fetch": "^2.6.0"
   }
 }
