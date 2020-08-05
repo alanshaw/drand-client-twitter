@@ -10,6 +10,33 @@ npm i @alanshaw/drand-client-twitter
 
 ## Usage
 
+### Deno
+
+```js
+/* global Deno */
+import Client from 'https://deno.land/x/drand_client/drand.js'
+import Twitter from 'https://unpkg.com/@alanshaw/drand-client-twitter?module'
+
+const chainInfo = {
+  public_key: '868f005eb8e6e4ca0a47c8a77ceaa5309a47978a7c71bc5cce96366b5d7a569937c529eeda66c7293784a9402801af31',
+  period: 30,
+  genesis_time: 1595431050,
+  hash: '8990e7a9aaed2ffed73dbd7092123d6f289930540d7651336225dc172e51b2ce'
+}
+
+async function main () {
+  const c = await Client.wrap([
+    new Twitter({ bearerToken: 'AAAAAAAAAAAAAAAAAAAAAHJT...', chainInfo })
+  ], { chainInfo })
+
+  for await (const res of c.watch()) {
+    console.log(res)
+  }
+}
+
+main()
+```
+
 ### Node.js
 
 ```js

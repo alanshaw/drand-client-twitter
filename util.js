@@ -8,16 +8,16 @@ export async function sha256 (buf) {
     return crypto.subtle.digest('SHA-256', buf)
   }
 
-  // Node.js
-  if (typeof process !== 'undefined') {
-    const crypto = await import('crypto')
-    return crypto.createHash('sha256').update(buf).digest()
-  }
-
   // Deno
   if (typeof Deno !== 'undefined') {
     const { Sha256 } = await import('https://deno.land/x/sha2@1.0.0/mod/sha256.ts')
     return new Sha256().hashToBytes(buf)
+  }
+
+  // Node.js
+  if (typeof process !== 'undefined') {
+    const crypto = await import('crypto')
+    return crypto.createHash('sha256').update(buf).digest()
   }
 
   throw new Error('no supported crypto implementation found')

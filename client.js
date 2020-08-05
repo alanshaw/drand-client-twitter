@@ -110,7 +110,7 @@ export default class Client {
           if (prevData.length !== 2) {
             throw new Error(`beacon not found ${round - 1}`)
           }
-          prevBeacon = prevData[prevData.length - 1]
+          prevBeacon = JSON.parse(prevData[prevData.length - 1].full_text)
           if (prevBeacon.round !== round - 1) {
             throw new Error(`expected previous beacon ${round - 1} but got ${prevBeacon.round}`)
           }

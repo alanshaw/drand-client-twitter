@@ -1,10 +1,11 @@
 /* global Deno */
 import Client from 'https://deno.land/x/drand_client/drand.js'
-import Twitter from '../client.js'
+import Twitter from 'https://unpkg.com/@alanshaw/drand-client-twitter?module'
 import chainInfo from './loe-chain-info.js'
 
 async function getCredentials () {
-  return JSON.parse(await Deno.readTextFile('./credentials.json'))
+  const dirname = new URL(import.meta.url).pathname.split('/').slice(0, -1).join('/')
+  return JSON.parse(await Deno.readTextFile(`${dirname}/credentials.json`))
 }
 
 async function main () {
