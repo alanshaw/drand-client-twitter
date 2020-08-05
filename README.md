@@ -1,8 +1,15 @@
 # drand-client-twitter
 
+[![dependencies Status](https://david-dm.org/alanshaw/drand-client-twitter/status.svg)](https://david-dm.org/alanshaw/drand-client-twitter)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+
 A client for the drand twitter relay.
 
 ## Install
+
+In [Deno](https://deno.land) you can grab and use the client from a CDN e.g. https://unpkg.com/@alanshaw/drand-client-twitter?module.
+
+In [Node.js](https://nodejs.org), install with:
 
 ```sh
 npm i @alanshaw/drand-client-twitter
@@ -10,11 +17,12 @@ npm i @alanshaw/drand-client-twitter
 
 ## Usage
 
-### Deno
+The client uses the [user timeline API](https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-user_timeline) exclusively. It is best suited for watching or getting the latest randomness generated. It's possible to get historic randomness up to the API limits of around 3,200 tweets. In order to retrieve historic randomness the client will walk the chain of tweets (max 200 per page).
+
+**Deno**
 
 ```js
-/* global Deno */
-import Client from 'https://deno.land/x/drand_client/drand.js'
+import Client from 'https://unpkg.com/drand-client/drand.js'
 import Twitter from 'https://unpkg.com/@alanshaw/drand-client-twitter?module'
 
 const chainInfo = {
@@ -37,13 +45,13 @@ async function main () {
 main()
 ```
 
-### Node.js
+**Node.js**
 
 ```js
-import fetch from 'node-fetch'
-import AbortController from 'abort-controller'
 import Client from 'drand-client'
 import Twitter from '@alanshaw/drand-client-twitter'
+import fetch from 'node-fetch'
+import AbortController from 'abort-controller'
 
 global.fetch = fetch
 global.AbortController = AbortController
@@ -68,9 +76,9 @@ async function main () {
 main()
 ```
 
-### Demo
+### Running the examples
 
-Add `credentials.json` to the examples directory like:
+Add `credentials.json` to the `examples/` directory like:
 
 ```json
 {
@@ -82,4 +90,18 @@ Run a client that watches for randomness and prints it to the console:
 
 ```sh
 node ./examples/node.js
+# or
+deno run --allow-net --allow-read ./examples/deno.js
 ```
+
+## API
+
+See the drand client [API Reference docs](https://github.com/drand/drand-client#api).
+
+## Contribute
+
+Feel free to dive in! [Open an issue](https://github.com/alanshaw/drand-client-twitter/issues/new) or submit PRs.
+
+## License
+
+[MIT](LICENSE) © Alan Shaw
