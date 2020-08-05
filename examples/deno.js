@@ -1,5 +1,5 @@
 /* global Deno */
-import Client from 'https://deno.land/x/drand_client/drand.js'
+import Client from 'https://unpkg.com/drand-client/drand.js'
 import Twitter from 'https://unpkg.com/@alanshaw/drand-client-twitter?module'
 import chainInfo from './loe-chain-info.js'
 
