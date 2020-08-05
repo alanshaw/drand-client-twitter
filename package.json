@@ -1,6 +1,6 @@
 {
   "name": "@alanshaw/drand-client-twitter",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A client for the drand twitter relay",
   "main": "client.js",
   "type": "module",
