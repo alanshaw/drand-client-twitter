@@ -4,10 +4,8 @@ import PollingWatcher from 'drand-client/polling-watcher.js'
 import { controllerWithParent } from 'drand-client/abort.js'
 import { hexToBuffer, bufferToHex, sha256, retry, pause } from './util.js'
 
-// Screen name of the twitter bot to use.
-const SCREEN_NAME = 'loebot'
 // Maximum retries for getting the latest round before it fails.
-const LATEST_ROUND_RETRIES = 10
+const LATEST_ROUND_RETRIES = 5
 // Backoff interval in ms between retries - doubled each retry.
 const LATEST_ROUND_RETRY_BACKOFF = 50
 // Expected delay in ms between randomness being generated and it being
@@ -18,19 +16,21 @@ const LATEST_ROUND_DELAY = 650
 const MAX_TWEET_COUNT = 200
 
 export default class Client {
-  constructor (options) {
-    options = options || {}
-    if (!options.bearerToken) throw new Error('bearer token required')
-    if (!options.chainInfo) throw new Error('chain info required')
-    this._options = options
-    this._chainInfo = options.chainInfo
-    this._screenName = options.screenName || SCREEN_NAME
-    this._watcher = new PollingWatcher(this, options.chainInfo)
+  constructor (config) {
+    config = config || {}
+    if (!config.screenName) throw new Error('screen name required')
+    if (!config.bearerToken) throw new Error('bearer token required')
+    if (!config.chainInfo) throw new Error('chain info required')
+    config.latestRoundDelay = config.latestRoundDelay || LATEST_ROUND_DELAY
+    config.latestRoundRetries = config.latestRoundRetries || LATEST_ROUND_RETRIES
+    config.latestRoundRetryBackoff = config.latestRoundRetryBackoff || LATEST_ROUND_RETRY_BACKOFF
+    this._config = config
+    this._watcher = new PollingWatcher(this, config.chainInfo)
     this._controllers = []
   }
 
   async info () {
-    return this._chainInfo
+    return this._config.chainInfo
   }
 
   async get (round, options) {
@@ -46,14 +46,14 @@ export default class Client {
       let rand
       if (round === latestRound) {
         const latestRoundTime = this._roundTime(latestRound)
-        const delay = this._options.latestRoundDelay || LATEST_ROUND_DELAY
+        const delay = this._config.latestRoundDelay
         if (now - latestRoundTime < delay) {
           // console.log('in delay period, pausing for ', latestRoundTime + delay - now, 'ms')
           await pause(latestRoundTime + delay - now, { signal: options.signal })
         }
         rand = await retry(() => this._get(round, { ...options, count: 2 }), {
-          times: this._options.latestRoundRetries || LATEST_ROUND_RETRIES,
-          backoff: this._options.latestRoundRetryBackoff || LATEST_ROUND_RETRY_BACKOFF,
+          times: this._config.latestRoundRetries,
+          backoff: this._config.latestRoundRetryBackoff,
           signal: options.signal
         })
       } else {
@@ -69,13 +69,13 @@ export default class Client {
   async _get (round, options) {
     let maxID
     while (true) {
-      let url = `https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=${this._screenName}&count=${options.count || MAX_TWEET_COUNT}&trim_user=true&include_rts=false&exclude_replies=true&tweet_mode=extended`
+      let url = `https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=${this._config.screenName}&count=${options.count || MAX_TWEET_COUNT}&trim_user=true&include_rts=false&exclude_replies=true&tweet_mode=extended`
       if (maxID) {
         url += '&max_id=' + maxID
       }
       // console.log('_get', url)
       const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${this._options.bearerToken}` },
+        headers: { Authorization: `Bearer ${this._config.bearerToken}` },
         signal: options.signal
       })
       if (!res.ok) {
@@ -97,10 +97,11 @@ export default class Client {
       if (beaconIndex !== -1) {
         const beacon = beacons[beaconIndex]
         let prevBeacon = beacons.find(b => b.round === round - 1)
+        // TODO: make more DRY
         if (!prevBeacon) {
-          const url = `https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=${this._screenName}&count=2&trim_user=true&include_rts=false&exclude_replies=true&tweet_mode=extended&max_id=${data[beaconIndex].id_str}`
+          const url = `https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=${this._config.screenName}&count=2&trim_user=true&include_rts=false&exclude_replies=true&tweet_mode=extended&max_id=${data[beaconIndex].id_str}`
           const res = await fetch(url, {
-            headers: { Authorization: `Bearer ${this._options.bearerToken}` },
+            headers: { Authorization: `Bearer ${this._config.bearerToken}` },
             signal: options.signal
           })
           if (!res.ok) {
@@ -138,11 +139,11 @@ export default class Client {
   }
 
   roundAt (time) {
-    return Chain.roundAt(time, this._chainInfo.genesis_time * 1000, this._chainInfo.period * 1000)
+    return Chain.roundAt(time, this._config.chainInfo.genesis_time * 1000, this._config.chainInfo.period * 1000)
   }
 
   _roundTime (round) {
-    return Chain.roundTime(round, this._chainInfo.genesis_time * 1000, this._chainInfo.period * 1000)
+    return Chain.roundTime(round, this._config.chainInfo.genesis_time * 1000, this._config.chainInfo.period * 1000)
   }
 
   async close () {
