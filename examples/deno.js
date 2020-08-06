@@ -11,7 +11,7 @@ async function getCredentials () {
 async function main () {
   const { bearerToken } = await getCredentials()
   const c = await Client.wrap([
-    new Twitter({ bearerToken, chainInfo })
+    new Twitter({ screenName: 'loebot', bearerToken, chainInfo })
   ], { chainInfo })
 
   for await (const res of c.watch()) {
