@@ -1,6 +1,6 @@
 /* global Deno */
-import Client from 'https://unpkg.com/drand-client/drand.js'
-import Twitter from 'https://unpkg.com/@alanshaw/drand-client-twitter?module'
+import Client from 'https://unpkg.com/drand-client@0.2.0/drand.js'
+import Twitter from 'https://unpkg.com/@alanshaw/drand-client-twitter@0.2.0/client.js?module'
 import chainInfo from './loe-chain-info.js'
 
 async function getCredentials () {
