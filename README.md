@@ -34,7 +34,7 @@ const chainInfo = {
 
 async function main () {
   const c = await Client.wrap([
-    new Twitter({ bearerToken: 'AAAAAAAAAAAAAAAAAAAAAHJT...', chainInfo })
+    new Twitter({ screenName: 'loebot', bearerToken: 'AAAAAAAAAAAAAAAAAAAAAHJT...', chainInfo })
   ], { chainInfo })
 
   for await (const res of c.watch()) {
@@ -65,7 +65,7 @@ const chainInfo = {
 
 async function main () {
   const c = await Client.wrap([
-    new Twitter({ bearerToken: 'AAAAAAAAAAAAAAAAAAAAAHJT...', chainInfo })
+    new Twitter({ screenName: 'loebot', bearerToken: 'AAAAAAAAAAAAAAAAAAAAAHJT...', chainInfo })
   ], { chainInfo })
 
   for await (const res of c.watch()) {
@@ -96,7 +96,25 @@ deno run --allow-net --allow-read ./examples/deno.js
 
 ## API
 
+```js
+import Twitter from '@alanshaw/drand-client-twitter'
+```
+
 See the drand client [API Reference docs](https://github.com/drand/drand-client#api).
+
+### `new Twitter(config)`
+
+Create a new drand Twitter client.
+
+* `config.screenName` - screen name of the twitter user that is relaying randomness (required).
+* `config.bearerToken` - access token for using the Twitter API (required).
+* `config.chainInfo` - information about the chain of randomness that is being relayed, for beacon verification (required).
+
+Optional configuration:
+
+* `config.latestRoundDelay` - expected delay in ms between randomness being generated and it being available on twitter, reduce this for faster latest randomness but more requests to twitter (default `650`ms).
+* `config.latestRoundRetries` - maximum retries for getting the latest round before it fails (default `5`).
+* `config.latestRoundRetryBackoff` - backoff interval in ms between retries - doubled each retry (default `50`).
 
 ## Contribute
 
